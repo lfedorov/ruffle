@@ -622,6 +622,17 @@ impl RuffleHandle {
                                 .set_pointer_capture(js_event.pointer_id());
                         }
                         let device_pixel_ratio = instance.device_pixel_ratio;
+                        // For touch events, first send a MouseMove to update the mouse position
+                        if js_event.pointer_type() == "touch" {
+                            let move_event = PlayerEvent::MouseMove {
+                                x: f64::from(js_event.offset_x()) * device_pixel_ratio,
+                                y: f64::from(js_event.offset_y()) * device_pixel_ratio
+                            };
+                            let _ = instance.with_core_mut(|core| {
+                                core.handle_event(move_event);
+                            });
+                        }
+                        
                         let button = match js_event.button() {
                             0 => MouseButton::Left,
                             1 => MouseButton::Middle,
@@ -660,6 +671,17 @@ impl RuffleHandle {
                                 .unchecked_ref::<Element>()
                                 .release_pointer_capture(js_event.pointer_id());
                         }
+                        // For touch events, first send a MouseMove to update the mouse position
+                        if js_event.pointer_type() == "touch" {
+                            let move_event = PlayerEvent::MouseMove {
+                                x: f64::from(js_event.offset_x()) * instance.device_pixel_ratio,
+                                y: f64::from(js_event.offset_y()) * instance.device_pixel_ratio
+                            };
+                            let _ = instance.with_core_mut(|core| {
+                                core.handle_event(move_event);
+                            });
+                        }
+
                         let event = PlayerEvent::MouseUp {
                             x: f64::from(js_event.offset_x()) * instance.device_pixel_ratio,
                             y: f64::from(js_event.offset_y()) * instance.device_pixel_ratio,
