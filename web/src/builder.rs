@@ -66,6 +66,7 @@ pub struct RuffleInstanceBuilder {
     pub(crate) gamepad_button_mapping: HashMap<GamepadButton, KeyCode>,
     pub(crate) url_rewrite_rules: Vec<(RegExp, String)>,
     pub(crate) scrolling_behavior: ScrollingBehavior,
+    pub(crate) elky_enable_touch_mouse_move: bool,
 }
 
 impl Default for RuffleInstanceBuilder {
@@ -105,6 +106,7 @@ impl Default for RuffleInstanceBuilder {
             gamepad_button_mapping: HashMap::new(),
             url_rewrite_rules: vec![],
             scrolling_behavior: ScrollingBehavior::Smart,
+            elky_enable_touch_mouse_move: false,
         }
     }
 }
@@ -346,6 +348,11 @@ impl RuffleInstanceBuilder {
             "smart" => ScrollingBehavior::Smart,
             _ => return,
         };
+    }
+
+    #[wasm_bindgen(js_name = "setElkyEnableTouchMouseMove")]
+    pub fn set_elky_enable_touch_mouse_move(&mut self, value: bool) {
+        self.elky_enable_touch_mouse_move = value;
     }
 
     // TODO: This should be split into two methods that either load url or load data

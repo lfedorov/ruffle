@@ -144,6 +144,7 @@ struct RuffleInstance {
     trace_observer: Rc<RefCell<JsValue>>,
     log_subscriber: Arc<Layered<WASMLayer, Registry>>,
     pressed_buttons: Vec<GamepadButton>,
+    elky_enable_touch_mouse_move: bool,
 }
 
 #[wasm_bindgen(raw_module = "./internal/player/inner")]
@@ -533,6 +534,7 @@ impl RuffleHandle {
             trace_observer: player.trace_observer,
             log_subscriber,
             pressed_buttons: vec![],
+            elky_enable_touch_mouse_move: config.elky_enable_touch_mouse_move,
         };
 
         // Prevent touch-scrolling on canvas.
@@ -623,7 +625,13 @@ impl RuffleHandle {
                         }
                         let device_pixel_ratio = instance.device_pixel_ratio;
                         // For touch events, first send a MouseMove to update the mouse position
-                        if js_event.pointer_type() == "touch" {
+                        // Only do this if the feature is enabled in configuration
+                        if instance.elky_enable_touch_mouse_move {
+                            // Safely check if pointer_type exists (only available on PointerEvent, not MouseEvent)
+                            let is_touch = js_sys::Reflect::get(&js_event, &JsValue::from_str("pointerType"))
+                                .map(|val| val.as_string().map(|s| s == "touch").unwrap_or(false))
+                                .unwrap_or(false);
+                            if is_touch {
                             let move_event = PlayerEvent::MouseMove {
                                 x: f64::from(js_event.offset_x()) * device_pixel_ratio,
                                 y: f64::from(js_event.offset_y()) * device_pixel_ratio
@@ -631,6 +639,7 @@ impl RuffleHandle {
                             let _ = instance.with_core_mut(|core| {
                                 core.handle_event(move_event);
                             });
+                            }
                         }
                         
                         let button = match js_event.button() {
@@ -672,7 +681,13 @@ impl RuffleHandle {
                                 .release_pointer_capture(js_event.pointer_id());
                         }
                         // For touch events, first send a MouseMove to update the mouse position
-                        if js_event.pointer_type() == "touch" {
+                        // Only do this if the feature is enabled in configuration
+                        if instance.elky_enable_touch_mouse_move {
+                            // Safely check if pointer_type exists (only available on PointerEvent, not MouseEvent)
+                            let is_touch = js_sys::Reflect::get(&js_event, &JsValue::from_str("pointerType"))
+                                .map(|val| val.as_string().map(|s| s == "touch").unwrap_or(false))
+                                .unwrap_or(false);
+                            if is_touch {
                             let move_event = PlayerEvent::MouseMove {
                                 x: f64::from(js_event.offset_x()) * instance.device_pixel_ratio,
                                 y: f64::from(js_event.offset_y()) * instance.device_pixel_ratio
@@ -680,6 +695,7 @@ impl RuffleHandle {
                             let _ = instance.with_core_mut(|core| {
                                 core.handle_event(move_event);
                             });
+                            }
                         }
 
                         let event = PlayerEvent::MouseUp {

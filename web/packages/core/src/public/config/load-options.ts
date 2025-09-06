@@ -758,6 +758,16 @@ export interface BaseLoadOptions {
      * @default ScrollingBehavior.Smart
      */
     scrollingBehavior?: ScrollingBehavior;
+
+    /**
+     * Enable sending MouseMove events before MouseDown/MouseUp for touch events.
+     *
+     * This can help with touch interactions by ensuring the mouse position is updated
+     * before handling mouse button events on touch devices.
+     *
+     * @default false
+     */
+    elkyEnableTouchMouseMove?: boolean;
 }
 
 /**

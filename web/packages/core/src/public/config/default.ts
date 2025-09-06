@@ -56,4 +56,5 @@ export const DEFAULT_CONFIG: Required<BaseLoadOptions> = {
     gamepadButtonMapping: {},
     urlRewriteRules: [],
     scrollingBehavior: ScrollingBehavior.Smart,
+    elkyEnableTouchMouseMove: false,
 };
