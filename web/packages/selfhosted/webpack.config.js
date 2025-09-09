@@ -23,7 +23,8 @@ export default function (_env, _argv) {
             path: url.fileURLToPath(new URL("dist", import.meta.url)),
             filename: "ruffle.js",
             publicPath: "",
-            chunkFilename: "core.ruffle.[contenthash].js",
+            chunkFilename: "core.ruffle.js",
+            assetModuleFilename: '[name][ext][query]',
             clean: true,
         },
         performance: {
